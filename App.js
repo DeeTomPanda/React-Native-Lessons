@@ -1,106 +1,124 @@
 import {StatusBar} from 'expo-status-bar';
-import {StyleSheet,Text,View,Platform,Dimensions} from 'react-native';
-import React from 'react';
+import {StyleSheet,Text,View,Platform,Dimensions,Button} from 'react-native';
+import * as React from 'react';
 import {PropTypes} from 'prop-types';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {createDrawerNavigator} from '@react-navigation/drawer';                    //Android
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';                //iOS
 
-const grid_arr=new Array(10).fill(null).map((v,i)=>i+1);
-console.log(grid_arr);
 
-function Row(props) 
+const Tab=createBottomTabNavigator();
+const Drawer=createDrawerNavigator();
+const Stack=createNativeStackNavigator();
+
+const App=()=>
 {
-  return <View style={styles.row}>{props.children}</View>;
+ return(
+	<NavigationContainer>
+	   <Stack.Navigator initialRouteName="Home">
+	     <Stack.Screen name="Home" component={Home}/>
+	     <Stack.Screen name="Settings" component={Settings}/>
+	     <Stack.Screen 
+	                   name="Details" 
+	                   component={Details}
+	                   options=
+	                   {({route})=>(                              
+			        //{route} is a dummy destructured prop
+			        {    
+			   	   headerRight:()=>
+				   {
+				      return(
+					      <Button
+					             title="headerRButton"
+					             onPress={()=>{}}/>
+				            )
+
+				   },
+				})
+			   }/>
+	   </Stack.Navigator>
+	 </NavigationContainer>
+       );	
 }
 
-function Column(props)
-{
-  return <View style={styles.column}>{props.children}</View>
-}
-const Box=(props)=>
-{
-	return(
-		<View style={styles.box}>
-		   <Text>{props.children}</Text>
-		</View>
-	);
-}
+//Components always defined below App
 
-function App()
+const Home=({navigation})=>
 {
-      return(
-	      <View style={styles.container}>
-	      <StatusBar hidden={true}/>
-	      <Row>
-                 <Column>
-                    <Box>{'#1'}</Box>
-                    <Box>{'#2'}</Box>
-                 </Column>
-	      <Column>
-                    <Box>{'#3'}</Box>
-                    <Box>{'#4'}</Box>
-                 </Column>
-	      </Row>
-	      <Row>
-                 <Column>
-                   <Box>{'#5'}</Box>
-                   <Box>{'#6'}</Box>
-                 </Column>
-	         <Column>
-                   <Box>{'#7'}</Box>
-                   <Box>{'#8'}</Box>
-                 </Column>
-              </Row>
+ return(
+	<View style={styles.container}>
+	 <View style={styles.innerContainer}>
+	        <StatusBar barStyle="dark-content"/>
+		<Text>{"Home Screen!!!"}</Text>
+	        <Button
+	                title={"Settings"}
+	                onPress={()=>navigation.navigate("Settings")}/>
+	        <Button
+	                title={"Item #1"}
+	                onPress={()=>navigation.navigate("Details",{
+				title:"Item #1",})
+			        }/>
+	       <Button
+	                title={"Item #2"}
+	                onPress={()=>navigation.navigate("Details",{
+				title:"Item #2",})
+				}/>
+	 </View>
 	</View>
-      );
-   //}
+ );
 }
 
-const styles=StyleSheet.create(
+const Settings=({navigation})=>
+{
+ return(
+	<View style={styles.container}>
+	   <StatusBar barStyle="dark-content"/>
+	   <Text>{"Settings"}</Text>
+	   <Button 
+	          title={"Home"}
+	          onPress={()=>navigation.navigate("Home")}/>
+	</View>);
+}
+
+const Details=({route,navigation})=>
+{
+	const {title}=route.params;
+        console.log(typeof(route.params));
+	React.useLayoutEffect(()=>
 	{
-		container:{
-			flex:1,
-			flexDirection:'column',
-			backgroundColor:"indigo",
-			justifyContent:"space-around",
-			alignItems:"center",
-			...Platform.select({
-				ios:{paddingTop:20},
-				android:{paddingTop:StatusBar.currentHeight},
-				default:{backgroundColor:'skyblue'}
-			}),
-		},
-		box:{
-			height:100,
-			width:100,
-			justifyContent:'center',
-			alignItems:'center',	
-			backgroundColor:'lightgray',
-			borderWidth:1,
-			borderStyle:'dashed',
-			borderColor:'darkslategray',
-			backgroundColor:'palegreen',
-		},
-		row:{
-			flex:1,
-			flexDirection:'row',
-			justifyContent:'space-around',
-			alignSelf:'stretch',
-			alignItems:'center'
-		},
-		column:{
-			flex:1,
-			flexDirection:'column',
-			justifyContent:'space-around',
-			alignItems:'center',
-			alignSelf:'stretch',
-			backgroundColor:'purple'
-		},
-		text:{
-			fontWeight:'bold',
-		}
-	});
+	     navigation.setOptions({title});
+	},[]);
 
-
-Box.propTypes={
-	children:PropTypes.node.isRequired
+	return(
+		<View style={styles.container}>
+		    <Text>{"This is " + title}</Text>
+		    <Button
+		            title={"Home"}
+		            onPress={()=>navigation.navigate("Home")}/>
+		</View>);
 }
+
+
+const styles=StyleSheet.create({
+	container:{
+		   flex:1,
+		   flexDirection:'column',
+		   alignItems:'center',
+		   justifyContent:'center',
+		   ...Platform.select({
+			   android:{
+				    paddingTop:StatusBar.currentHeight,
+			            backgroundColor:'coral'},
+			   default:{
+				    backgroundColor:'blueviolet'} 
+		                     })
+	          },
+	inner:{
+		flex:1,
+		justifyContent:'space-around',
+		alignItems:'center'
+	      }
+});
+
 export default App;
