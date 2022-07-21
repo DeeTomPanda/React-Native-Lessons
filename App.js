@@ -1,106 +1,96 @@
 import {StatusBar} from 'expo-status-bar';
-import {StyleSheet,Text,View,Platform,Dimensions} from 'react-native';
-import React from 'react';
+import {StyleSheet,Text,View,Platform,Dimensions,Button} from 'react-native';
+import * as React from 'react';
 import {PropTypes} from 'prop-types';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {createDrawerNavigator} from '@react-navigation/drawer';                    //Android
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';                //iOS
 
-const grid_arr=new Array(10).fill(null).map((v,i)=>i+1);
-console.log(grid_arr);
 
-function Row(props) 
+const Tab=createBottomTabNavigator();
+const Drawer=createDrawerNavigator();
+const Stack=createNativeStackNavigator();
+
+const App=()=>
 {
-  return <View style={styles.row}>{props.children}</View>;
+ Platform.OS==="web" && (console.log("Web"))
+ return(
+	<NavigationContainer>
+	   <Drawer.Navigator>
+	      <Drawer.Screen name="Home" component={Home}/>
+	      <Drawer.Screen name="Settings" component={Settings}/>
+	      <Drawer.Screen name="Details" component={Details}/>
+	   </Drawer.Navigator>
+	</NavigationContainer>);
 }
 
-function Column(props)
+//Components always defined below App
+
+const Home=({navigation})=>
 {
-  return <View style={styles.column}>{props.children}</View>
+ return(
+	<View style={styles.container}>
+	   <StatusBar barStyle="dark-content"/>
+	   <Text>{"Home Screen!!!"}</Text>
+	   <Button
+	          title={"Settings"}
+	          onPress={()=>
+		  {
+		     navigation.navigate("Settings");
+		  }
+		}/>
+	  <Button
+	          title={"Details"}
+	          onPress={()=>navigation.navigate("Details")}/>
+	</View>);
 }
-const Box=(props)=>
+
+const Settings=({navigation})=>
 {
+ return(
+	<View style={styles.container}>
+	   <StatusBar barStyle="dark-content"/>
+	   <Text>{`Settings`}</Text>
+	   <Button 
+	          title={"Home"}
+	          onPress={()=>navigation.navigate("Home")}/>
+	   <Button
+	          title={"Details"}
+	          onPress={()=>navigation.navigate("Details")}/>
+	</View>);
+}
+
+const Details=({navigation})=>
+{
+
 	return(
-		<View style={styles.box}>
-		   <Text>{props.children}</Text>
-		</View>
-	);
+		<View style={styles.container}>
+		    <Text>{"This is Details"}</Text>
+		    <Button
+		            title={"Home"}
+		            onPress={()=>navigation.navigate("Home")}/>
+		    <Button
+		            title={"Settings"}
+		            onPress={()=>navigation.navigate("Settings")}/>
+		</View>);
 }
 
-function App()
-{
-      return(
-	      <View style={styles.container}>
-	      <StatusBar hidden={true}/>
-	      <Row>
-                 <Column>
-                    <Box>{'#1'}</Box>
-                    <Box>{'#2'}</Box>
-                 </Column>
-	      <Column>
-                    <Box>{'#3'}</Box>
-                    <Box>{'#4'}</Box>
-                 </Column>
-	      </Row>
-	      <Row>
-                 <Column>
-                   <Box>{'#5'}</Box>
-                   <Box>{'#6'}</Box>
-                 </Column>
-	         <Column>
-                   <Box>{'#7'}</Box>
-                   <Box>{'#8'}</Box>
-                 </Column>
-              </Row>
-	</View>
-      );
-   //}
-}
 
-const styles=StyleSheet.create(
-	{
-		container:{
-			flex:1,
-			flexDirection:'column',
-			backgroundColor:"indigo",
-			justifyContent:"space-around",
-			alignItems:"center",
-			...Platform.select({
-				ios:{paddingTop:20},
-				android:{paddingTop:StatusBar.currentHeight},
-				default:{backgroundColor:'skyblue'}
-			}),
-		},
-		box:{
-			height:100,
-			width:100,
-			justifyContent:'center',
-			alignItems:'center',	
-			backgroundColor:'lightgray',
-			borderWidth:1,
-			borderStyle:'dashed',
-			borderColor:'darkslategray',
-			backgroundColor:'palegreen',
-		},
-		row:{
-			flex:1,
-			flexDirection:'row',
-			justifyContent:'space-around',
-			alignSelf:'stretch',
-			alignItems:'center'
-		},
-		column:{
-			flex:1,
-			flexDirection:'column',
-			justifyContent:'space-around',
-			alignItems:'center',
-			alignSelf:'stretch',
-			backgroundColor:'purple'
-		},
-		text:{
-			fontWeight:'bold',
-		}
-	});
+const styles=StyleSheet.create({
+	container:{
+		   flex:1,
+		   flexDirection:'column',
+		   alignItems:'center',
+		   justifyContent:'center',
+		   ...Platform.select({
+			   android:{
+				    paddingTop:StatusBar.currentHeight,
+			            backgroundColor:'coral'},
+			   default:{
+				    backgroundColor:'blueviolet'} 
+		                     })
+	          },
+});
 
-
-Box.propTypes={
-	children:PropTypes.node.isRequired
-}
 export default App;
